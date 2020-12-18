@@ -511,12 +511,13 @@ class CreateSITREPTables(object):
 
         # output feature classes -- TODO figure this out to return multiple feature classes
         # https://gis.stackexchange.com/questions/9406/using-multivalue-output-parameter-with-arcpy
-        #param_outputfcpath = arcpy.Parameter(
-        #    displayName="Output Feature",
-        #    name="param_outputfcpath",
-        #    datatype="GPFeatureLayer",
-        #    parameterType="Derived",
-        #    direction="Output")
+        param_outputfcpaths = arcpy.Parameter(
+            displayName="Output Features",
+            name="param_outputfcpath",
+            datatype="GPFeatureLayer",
+            multiValue=True,
+            parameterType="Derived",
+            direction="Output")
 
         param_geojoinfield.parameterDependencies = [param_geolayer.name]
 
@@ -524,7 +525,7 @@ class CreateSITREPTables(object):
         param_geojoinfield.enabled = False
         param_keepallgeo.enabled = False
 
-        return [param_url, param_username, param_password, param_outbreak, param_output_folder, param_outworkspace, param_joingeo, param_geolayer, param_geojoinfield, param_keepallgeo]
+        return [param_url, param_username, param_password, param_outbreak, param_output_folder, param_outworkspace, param_joingeo, param_geolayer, param_geojoinfield, param_keepallgeo, param_outputfcpaths]
 
     def isLicensed(self):
         """Set whether tool is licensed to execute."""
@@ -730,8 +731,6 @@ class CreateSITREPTables(object):
 
             output_paths.append(fc_path)           
              
-            # set the output parameter
-            # arcpy.SetParameter(<n>, ';'.join(listOfOutputFCs))
 
         # Deaths by Reporting Area
         filtered_cases = [c for c in new_cases if 'outcomeId_code' in c and c['outcomeId_code'] == 'LNG_REFERENCE_DATA_CATEGORY_OUTCOME_DECEASED']
@@ -873,273 +872,9 @@ class CreateSITREPTables(object):
 
             output_paths.append(fc_path)
 
+
+        if len(output_paths) > 0:
+            # set the output parameter
+            arcpy.SetParameter(10, ';'.join(output_paths))
         
-        return
-
-class ExtractOutbreakData(object):
-
-    global outbreaks_cache 
-    outbreaks_cache = {}
-
-    global selected_outbreak_id
-    selected_outbreak_id = None
-
-    global token
-    token = None
-
-    def __init__(self):
-        """Define the tool (tool name is the name of the class)."""
-        self.label = "Extract Outbreak Data to CSV"
-        self.description = "Extract all outbreak data from Go.Data and convert to CSV files."
-        self.canRunInBackground = False
-
-    def getParameterInfo(self):
-        """Define parameter definitions"""
-         #Define parameter definitions
-
-        #######################
-        # START DEFINE PARAMS #
-        #######################
-
-        # Go.Data Url (API)
-        param0 = arcpy.Parameter(
-            displayName="Go.Data Url",
-            name="in_url",
-            datatype="GPString",
-            parameterType="Required",
-            direction="Input")
-
-        # Username
-        param1 = arcpy.Parameter(
-            displayName="Username",
-            name="in_username",
-            datatype="GPString",
-            parameterType="Required",
-            direction="Input")
-        
-        # Password
-        param2 = arcpy.Parameter(
-            displayName="Password",
-            name="in_password",
-            datatype="GPStringHidden",
-            parameterType="Required",
-            direction="Input")
-
-        # Outbreaks
-        param3 = arcpy.Parameter(
-            displayName="Outbreak",
-            name="in_outbreak",
-            datatype="GPString",
-            parameterType="Required",
-            direction="Input")
-
-        # Output Folder for CSV files
-        param4 = arcpy.Parameter(
-            displayName="Output folder for CSVs",
-            name="in_outcsvfolder",
-            datatype="DEFolder",
-            parameterType="Required",
-            direction="Input")
-
-        # Create FeatureClass Tables
-        param5 = arcpy.Parameter(
-            displayName="Create Output Feature Class Tables?",
-            name="in_createfctables",
-            datatype="GPBoolean",
-            parameterType="Optional",
-            direction="Input")
-
-        # Geography Layer
-        param6 = arcpy.Parameter(
-            displayName="Geography Layer",
-            name="in_geolayer",
-            datatype=["GPFeatureLayer", "GPLayer", "Shapefile"],
-            parameterType="Optional",
-            direction="Input")
-
-        # Geography Join Field
-        param7 = arcpy.Parameter(
-            displayName="Geography Join Field",
-            name="in_geofield",
-            datatype="Field",
-            parameterType="Optional",
-            direction="Input")
-
-        # Keep all Geography Features
-        param8 = arcpy.Parameter(
-            displayName="Keep all Geography Features",
-            name="in_keepallgeo",
-            datatype="GPBoolean",
-            parameterType="Optional",
-            direction="Input")
-
-        # Output Workspace
-        param9 = arcpy.Parameter(
-            displayName="Output Workspace",
-            name="in_outputfcworkspace",
-            datatype="DEWorkspace",
-            parameterType="Optional",
-            direction="Input")
-
-        # Output File Name
-        param10 = arcpy.Parameter(
-            displayName="Output File Name",
-            name="in_outputfcfilename",
-            datatype="GPString",
-            parameterType="Optional",
-            direction="Input")
-
-        ### DEBUG
-        param99 = arcpy.Parameter(
-            displayName="Debug",
-            name="in_debuf",
-            datatype="GPString",
-            parameterType="Optional",
-            direction="Input")
-
-        #####################
-        # END DEFINE PARAMS #
-        #####################
-
-        ###########################
-        # START MORE PARAMS SETUP #
-        ###########################
-
-        # Default Values
-        param0.value = "http://who-stable.clarisoft.co"
-        param1.value = "apfister@esri.com"
-        param2.value = "pVtun4eqVWPBfsagaHPz%kjwwWPkDs"
-
-        param3.filter.list = []
-
-        param7.parameterDependencies = [param6.name]
-
-        param6.enabled = False
-        param7.enabled = False
-        param8.enabled = False
-        param9.enabled = False
-        param10.enabled = False
-
-        param6.category = 'Output Feature Class'
-        param7.category = 'Output Feature Class'
-        param8.category = 'Output Feature Class'
-        param9.category = 'Output Feature Class'
-        param10.category = 'Output Feature Class'
-
-        #########################
-        # END MORE PARAMS SETUP #
-        #########################
-
-        # Params to return
-        return [param0, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10]
-
-    def isLicensed(self):
-        """Set whether tool is licensed to execute."""
-        return True
-
-    def updateParameters(self, parameters):
-        """Modify the values and properties of parameters before internal
-        validation is performed.  This method is called whenever a parameter
-        has been changed."""
-
-        global outbreaks_cache
-        global selected_outbreak_id
-        global token
-
-        if parameters[0].altered and not parameters[0].hasBeenValidated or (parameters[1].altered and not parameters[1].hasBeenValidated) or (parameters[2].altered and not parameters[2].hasBeenValidated):
-            url = parameters[0].value
-            username = parameters[1].value
-            password = parameters[2].value
-
-            if not parameters[0].value or not parameters[1].value or not parameters[2].value:
-                return
-
-            token = get_token(url, username, password)
-
-            if token == 'not_set':
-                return 
-
-            parameters[3].filter.list = []
-            outbreaks = get_outbreaks(url, token)
-            if not isinstance(outbreaks, list):
-                parameters[3].value = outbreaks
-                return
-
-            parameters[3].filter.list = outbreaks
-            parameters[3].value = outbreaks[0]
-         
-
-        if parameters[3].value:
-            # parameters[10].value = outbreaks_cache[parameters[3].value]
-            selected_outbreak_id = outbreaks_cache[parameters[3].value]
-
-
-        parameters[6].enabled = parameters[5].value
-        parameters[7].enabled = parameters[5].value
-        parameters[8].enabled = parameters[5].value
-        parameters[9].enabled = parameters[5].value
-        parameters[10].enabled = parameters[5].value
-
-        return
-
-    def updateMessages(self, parameters):
-        """Modify the messages created by internal validation for each tool
-        parameter.  This method is called after internal validation."""
-
-        # parameters[3].setErrorMessage('nope')
-        
-        return
-
-    def execute(self, parameters, messages):
-        """The source code of the tool."""
-
-        # setup globals
-        global selected_outbreak_id
-        global token
-
-        ################
-        # SCRIPT START #
-        ################
-
-        # Collect parameters
-        in_gd_api_url = parameters[0].valueAsText
-        in_gd_username = parameters[1].valueAsText
-        in_gd_password = parameters[2].valueAsText
-        in_gd_outcsvfolder = parameters[4].valueAsText
-
-        wd_res = create_working_directory(in_gd_outcsvfolder)
-        full_job_path = wd_res[0]
-        now_ts = wd_res[1]
-
-        in_gd_outbreak = selected_outbreak_id
-
-        # get reference codes & labels
-        # e.g. LNG_REFERENCE_DATA_CATEGORY_OUTCOME_ALIVE = 'Alive'
-        arcpy.SetProgressor('default', 'Getting Go.Data reference data')
-        ref_data = get_ref_data(in_gd_api_url, token)
-
-        #messages.addMessage(json.dumps(ref_data))
-
-        # get outbreak cases
-        arcpy.SetProgressor('default', 'Getting Outbreak Cases')
-        cases = get_cases(selected_outbreak_id, in_gd_api_url, token)
-        cases_csv_rows = convert_gd_json_to_csv(cases, ref_data)
-
-        # field names
-        unique_location_ids = []
-        go_data_field_names = ['locationId']
-        for c in cases_csv_rows:
-            for k in c.keys():
-                if not k in go_data_field_names:
-                    go_data_field_names.append(k)
-                if in_keep_all_geo:
-                    if k == 'locationId':
-                        if not c[k] in unique_location_ids:
-                            unique_location_ids.append(c[k])
-
-        # create cases CSV
-        arcpy.SetProgressor('default', 'Creating Cases CSV file ...')
-        path_to_csv_file = create_csv_file(cases_csv_rows, 'Cases.csv', go_data_field_names, full_job_path)
-
-
-        return
+        return 
