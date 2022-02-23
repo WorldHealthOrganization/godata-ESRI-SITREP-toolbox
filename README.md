@@ -12,5 +12,5 @@ This is a python toolbox for use in ArcGIS Pro (2.6.3, 2.7.1, 2.8.3) to extract,
 - Open ArcGIS Pro, and in the "Catalog" pane, right-click the "Toolboxes" icon and choose the "Add Toolbox" option
 - Browse to where you downloaded the files and select the Go.Data toolbox
 
-You should now see the toolbox and tool in ArcGIS Pro and you will be able to run it, given you have the requirements listed above. Please read the [Helpful tidbits](https://github.com/LangsterGA/test#helpful-tidbits) prior to using the tool in order to run it as smoothly as possible, especially the first time.
+You should now see the toolbox and tool in ArcGIS Pro and you will be able to run it, given you have the requirements listed above. Please read the [Helpful tidbits](https://worldhealthorganization.github.io/godata/arcgis-pro/#helpful-tidbits) prior to using the tool in order to run it as smoothly as possible, especially the first time.
 
