@@ -5,7 +5,7 @@ This is a python toolbox for use in ArcGIS Pro (2.6.3, 2.7.1, 2.8.3) to extract,
 - Go.Data URL, username and password
 - Name of the outbreak you wish to extract data for
 - ArcGIS Pro (toolbox is known to be compatible with 2.6.3, 2.7.1, 2.8.3)
-- *This toolbox is currently functioning with Go.Data version 40.2
+- This toolbox is currently functioning with Go.Data version 40.2
 
 ## Set up 
 - Download or clone the repo to your machine. To download a zip of this repo, go to the green 'Code' button in the top right of this page and choose download zip. 
