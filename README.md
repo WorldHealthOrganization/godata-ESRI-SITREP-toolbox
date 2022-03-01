@@ -4,6 +4,7 @@ This is a toolbox for use in ArcGIS Pro (2.6.3, 2.7.1, 2.8.3) to extract, transf
 ## Requirements
 - Go.Data URL, username and password
 - Name of the outbreak you wish to extract data for
+- GIS layer for mapping (optional)
 - ArcGIS Pro (toolbox is known to be compatible with 2.6.3, 2.7.1, 2.8.3)
 - This toolbox is currently functioning with Go.Data version 40.2
 
