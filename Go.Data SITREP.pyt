@@ -1066,7 +1066,7 @@ class CreateSITREPTables(object):
                 locations_out = locations_out.merge(adminlevel, how='left', left_on=parentlocid, right_on=parentlocid)
             i+=1
 
-        locations_out.dropna('columns', how='all', inplace=True)
+        locations_out.dropna(axis=1, how='all', inplace=True)
         locations_out.to_csv(full_job_path_raw.joinpath('Locations.csv'), encoding='utf-8-sig', index=False)
 
         #splitting the reference data
