@@ -1153,7 +1153,7 @@ class CreateSITREPTables(object):
         #prep locations file for join using the lowest level admin that is found in the cases data
         all_loc_ids =  locations_df[['id', 'adminLevel']].loc[locations_df['adminLevel']!=-1].rename(columns={'id':'locationId'}).set_index('locationId')
         all_cases_loc_ids = cases_df.groupby('locationId', as_index=False).count()[['locationId', 'id']].rename(columns={'id':'cnt'}).set_index('locationId')
-        admin_level = all_cases_loc_ids.join(all_loc_ids, how='left').groupby('adminLevel')['cnt'].sum().idxmax()
+        admin_level = int(all_cases_loc_ids.join(all_loc_ids, how='left').groupby('adminLevel')['cnt'].sum().idxmax())
         location_flds = [f'admin_{i}_name' for i in range(int(admin_level)+1)]
         location_flds.extend([f'admin_{admin_level}_LocationId', f'admin_{admin_level}_Lat', f'admin_{admin_level}_Lng'])
         locations_join = locations_out[location_flds].copy()
