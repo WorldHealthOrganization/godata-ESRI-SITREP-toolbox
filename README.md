@@ -17,6 +17,9 @@ For QGIS users, please find our similar offering [here](https://github.com/World
 
 You should now see the toolbox and tool in ArcGIS Pro and you will be able to run it, given you have the requirements listed above. Please read the [Helpful tidbits](https://worldhealthorganization.github.io/godata/arcgis-pro/#helpful-tidbits) prior to using the tool in order to run it as smoothly as possible, especially the first time.
 
+## Help
+In case you're experiencing any challenge while using this plugin, or if you have enhancements to suggest, please comment [here](https://github.com/WorldHealthOrganization/godata-ESRI-SITREP-toolbox/issues).
+
 ## About
 This plugin is a part of a series of open source projects developed as part of an informal collaboration between the WHO GIS Centre for Health and the GIS focal point of the GOARN Go.Data team. The aim of the collaboration is to provide free open source tools to improve a GIS user's ability to access, transfom, analyze and visualize public health data geospatially, especially during an emergency response.
 
