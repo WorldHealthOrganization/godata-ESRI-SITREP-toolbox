@@ -26,3 +26,9 @@ This plugin is a part of a series of open source projects developed as part of a
 Projects:
 - [ESRI SITREP toolbox](https://github.com/WorldHealthOrganization/godata-ESRI-SITREP-toolbox) - released March, 2022
 - [Extract plugin](https://github.com/WorldHealthOrganization/godata-extract-qgis-plugin) - released December, 2022
+
+Project team:
+
+Developer: Adam McKay, adam@addressdatamatters.ca  
+Project Manager: Amy Louise Lang, Langstervision@gmail.com
+
