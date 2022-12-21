@@ -24,7 +24,7 @@ In case you're experiencing any challenge while using this plugin, or if you hav
 This plugin is a part of a series of open source projects developed as part of an informal collaboration between the WHO GIS Centre for Health and the GIS focal point of the GOARN Go.Data team. The aim of the collaboration is to provide free open source tools to improve a GIS user's ability to access, transfom, analyze and visualize public health data geospatially, especially during an emergency response.
 
 Projects:
-- [ESRI SITREP toolbox](https://github.com/WorldHealthOrganization/godata-ESRI-SITREP-toolbox) - released March, 2022
+- [ESRI SITREP toolbox](https://github.com/WorldHealthOrganization/godata-ESRI-SITREP-toolbox) - released February, 2022
 - [Extract plugin](https://github.com/WorldHealthOrganization/godata-extract-qgis-plugin) - released December, 2022
 
 Project team:
