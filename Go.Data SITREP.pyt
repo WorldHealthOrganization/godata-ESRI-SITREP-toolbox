@@ -176,7 +176,11 @@ def convert_cases_json_to_csv(cases, ref_data):
         keys = case.keys()
         for key in keys:
             if key == 'age':
-                feature['age'] = case[key]['years']
+                if 'years' in case[key]:
+                    feature['age_years'] = case[key]['years']
+                if 'months' in case[key]:
+                    feature['age_months'] = case[key]['months']
+                    feature['age_years']= 0
             elif key == 'addresses':
                 address = case[key][0]
                 location_id = address['locationId']
@@ -239,7 +243,11 @@ def convert_contacts_json_to_csv(contacts, ref_data):
                 feature['dateFollowUpStart'] = contact[key]['startDate']
                 feature['dateFollowUpEnd'] = contact[key]['endDate']
             elif key == 'age':
-                feature['age'] = contact[key]['years']
+                if 'years' in contact[key]:
+                    feature['age_years'] = contact[key]['years']
+                if 'months' in contact[key]:
+                    feature['age_months'] = contact[key]['months']
+                    feature['age_years']= 0
             elif key == 'addresses':
                 address = contact[key][0]
                 location_id = address['locationId']
@@ -393,7 +401,8 @@ def get_FieldNameUpdater(in_model):
                 'middleName':'middle_name',
                 'lastName':'last_name',
                 'gender':'gender',
-                'age':'age',
+                'age_years':'age_years',
+                'age_months':'age_months',
                 'ageClass':'age_class',
                 'occupation':'occupation',
                 'pregnancyStatus':'pregnancy_status',
@@ -437,7 +446,8 @@ def get_FieldNameUpdater(in_model):
                 'middleName':'middle_name',
                 'lastName':'last_name',
                 'gender':'gender',
-                'age':'age',
+                'age_years':'age_years',
+                'age_months':'age_months',
                 'ageClass':'age_class',
                 'occupation':'occupation',
                 'vaccinated':'vaccinated',
