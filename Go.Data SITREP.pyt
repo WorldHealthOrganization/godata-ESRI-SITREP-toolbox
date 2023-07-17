@@ -39,23 +39,31 @@ from pathlib import Path
 import pandas as pd
 
 def set_working_directory(in_loc):
-    now_ts = datetime.now().strftime('%Y-%m-%d_%H%M%S')
+    # now_ts = datetime.now().strftime('%Y-%m-%d_%H%M%S')
     output_path = Path(in_loc) 
     return output_path
 
-def get_token(url, username, password):
-    data = {
+def get_token(url: str, username: str, password: str):
+    """Authenticates user with Go.Data Server
+    
+    :param url: Go.Data Server url
+    :param username: Go.Data username
+    :param password: Go.Data password
+
+    :return: A Go.Data token
+    :rtype: string 
+    """
+    creds = {
         "username": username,
         "password": password
     }
 
     token_res = None
     try:
-        token_res = requests.post(f'{url}/api/oauth/token', data=data)
+        token_res = requests.post(f'{url}/api/oauth/token', data=creds)
     except:
         return 'not_set'
-
-    # return token_res.url
+    
     token_res_json = token_res.json()
 
     token = 'not_set'
@@ -74,11 +82,19 @@ def get_token(url, username, password):
     return token
 
 def get_outbreaks(url, access_token):
-    global outbreaks_cache
+    """Gets a list of available outbreaks.
 
-    params = { "access_token": access_token }
+    :param url: Go.Data Server url
+    :param access_token: Go.Data access token
+
+    :return: A list of outbreak dictionaries
+    :rtype: List
+    """
+    
+    global outbreaks_cache
     available_outbreaks = []
 
+    params = { "access_token": access_token }
     outbreaks_res = requests.get(f'{url}/api/outbreaks', params=params)
     outbreaks_res_json = outbreaks_res.json()
     if 'error' in outbreaks_res_json:
@@ -104,11 +120,13 @@ def get_ref_data(in_gd_api_url, token):
     return ref_data_json
 
 def get_cases(outbreak_id, in_gd_api_url, token):
-    params = {
-        "access_token": token,
-        #"filter": json.dumps({"where":{"and":[{"classification":{"neq":"LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_NOT_A_CASE_DISCARDED"}}],"countRelations":True},"include":[{"relation":"dateRangeLocations","scope":{"filterParent":False,"justFilter":False}},{"relation":"createdByUser","scope":{"filterParent":False,"justFilter":False}},{"relation":"updatedByUser","scope":{"filterParent":False,"justFilter":False}},{"relation":"locations","scope":{"filterParent":False,"justFilter":False}}],"limit":0,"skip":0})
-    }
-    case_data = requests.get(f'{in_gd_api_url}/api/outbreaks/{outbreak_id}/cases', params=params)
+    # params = {
+    #     "access_token": token,
+    #     #"filter": json.dumps({"where":{"and":[{"classification":{"neq":"LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_NOT_A_CASE_DISCARDED"}}],"countRelations":True},"include":[{"relation":"dateRangeLocations","scope":{"filterParent":False,"justFilter":False}},{"relation":"createdByUser","scope":{"filterParent":False,"justFilter":False}},{"relation":"updatedByUser","scope":{"filterParent":False,"justFilter":False}},{"relation":"locations","scope":{"filterParent":False,"justFilter":False}}],"limit":0,"skip":0})
+    # }
+    fld_filter = r'filter=%7B%22fields%22%3A%20%7B%22firstName%22%3A%20false%2C%20%22middleName%22%3A%20false%2C%20%22lastName%22%3A%20false%2C%20%22duplicateKeys%22%3A%20false%7D%7D'
+    case_data = requests.get(f'{in_gd_api_url}/api/outbreaks/{outbreak_id}/cases?{fld_filter}&access_token={token}')
+    # case_data = requests.get(f'{in_gd_api_url}/api/outbreaks/{outbreak_id}/cases', params=params)
     case_data_json = case_data.json()
     arcpy.AddMessage(f'got cases data :: {len(case_data_json)} cases found')
     return case_data_json
@@ -123,10 +141,12 @@ def get_locations(in_gd_api_url, token):
     return location_data_json
 
 def get_contacts(outbreak_id, in_gd_api_url, token):
-    params = {
-        "access_token": token,
-    }
-    contact_data = requests.get(f'{in_gd_api_url}/api/outbreaks/{outbreak_id}/contacts', params=params)
+    # params = {
+    #     "access_token": token,
+    # }
+    fld_filter = r'filter=%7B%22fields%22%3A%20%7B%22firstName%22%3A%20false%2C%20%22middleName%22%3A%20false%2C%20%22lastName%22%3A%20false%2C%20%22duplicateKeys%22%3A%20false%7D%7D'
+
+    contact_data = requests.get(f'{in_gd_api_url}/api/outbreaks/{outbreak_id}/contacts?{fld_filter}&access_token={token}')
     contact_data_json = contact_data.json()
     arcpy.AddMessage(f'got contacts data :: {len(contact_data_json)} contacts found')
     return contact_data_json
@@ -397,9 +417,9 @@ def get_FieldNameUpdater(in_model):
                 'numberOfContacts':'no_contacts',
                 'numberOfExposures':'no_exposures',
                 'classification':'classification',
-                'firstName':'first_name',
-                'middleName':'middle_name',
-                'lastName':'last_name',
+                # 'firstName':'first_name',
+                # 'middleName':'middle_name',
+                # 'lastName':'last_name',
                 'gender':'gender',
                 'age_years':'age_years',
                 'age_months':'age_months',
@@ -442,9 +462,9 @@ def get_FieldNameUpdater(in_model):
                 'id':'id',
                 'visualId':'visual_id',
                 'classification':'classification',
-                'firstName':'first_name',
-                'middleName':'middle_name',
-                'lastName':'last_name',
+                # 'firstName':'first_name',
+                # 'middleName':'middle_name',
+                # 'lastName':'last_name',
                 'gender':'gender',
                 'age_years':'age_years',
                 'age_months':'age_months',
@@ -920,8 +940,8 @@ class CreateSITREPTables(object):
             token = get_token(url, username, password)
 
             if token == 'not_set':
-                return 
-
+                return
+            
             parameters[3].filter.list = []
             outbreaks = get_outbreaks(url, token)
             if not isinstance(outbreaks, list):
@@ -953,14 +973,11 @@ class CreateSITREPTables(object):
             parameters[7].setErrorMessage('Please enter a valid pathway for spatial data outputs')
         return
 
+
     def execute(self, parameters, messages):
          # setup globals
         global selected_outbreak_id
         global token
-
-        ################
-        # SCRIPT START #
-        ################
 
         # Collect parameters
         in_gd_api_url = parameters[0].valueAsText
@@ -982,6 +999,7 @@ class CreateSITREPTables(object):
         #now_ts = wd[2]
 
         full_job_path_raw = set_working_directory(in_gd_outputrawfolder)
+
         if in_gd_outputsumm:
             full_job_path_summ = set_working_directory(in_gd_outputsummfolder)
 
